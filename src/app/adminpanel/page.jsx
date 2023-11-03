@@ -10,6 +10,7 @@ const AdminPanel = () => {
     if (loading) {
       return;
     }
+    
     setLoading(true);
     fetch('https://asdasdasd-uwv3gbod2a-uc.a.run.app/dashboard/db-test')
       .then((res) => res.json())
@@ -23,7 +24,7 @@ const AdminPanel = () => {
   };
   useEffect(() => {
     loadMoreData();
-  }, []);
+  },[]);
   return (
     <div
       id="scrollableDiv"
@@ -39,6 +40,14 @@ const AdminPanel = () => {
         dataLength={data.length}
         next={loadMoreData}
         hasMore={data.length < 50}
+        // loader={
+        //   <Skeleton
+        //     paragraph={{
+        //       rows: 1,
+        //     }}
+        //     active
+        //   />
+        // }
         endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
         scrollableTarget="scrollableDiv"
       >

@@ -1,18 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
-import {
-    Button,
-    Form,
-    Input,
-    InputNumber,
-    Select,
-    DatePicker,
-    Table,
-    Row,
-} from "antd";
+import React, { useEffect, useRef } from "react";
+import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
+
+import ReactToPrint from "react-to-print";
+
 const { Option } = Select;
-const { Column, ColumnGroup } = Table;
 
 const Calculator = () => {
     const formRef = React.useRef(null);
@@ -21,7 +14,7 @@ const Calculator = () => {
     const [res_display, setResDisplay] = React.useState(true);
 
     const onFinish = (values) => {
-        console.log(values.date.toString());
+        console.log(info.date.toString());
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -55,16 +48,48 @@ const Calculator = () => {
             .catch((error) => console.log("error", error));
     };
 
+    const submitInfo = (values) => {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+
+      var raw = JSON.stringify({
+          id: res.id,
+          year: res.date.year(),
+          income: res.income,
+          tax: res.tax,
+          token: localStorage.getItem("token"),
+      });
+
+      var requestOptions = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+      };
+
+      fetch(
+          "https://asdasdasd-uwv3gbod2a-uc.a.run.app/dashboard/submit-info",
+          requestOptions
+      )
+          .then((response) => response.json())
+          .then((result) => {
+              console.log(result);
+          })
+          .catch((error) => console.log("error", error));
+  };
+
     useEffect(() => {
         console.log(res);
     }, [res]);
+
+    let pdfref = useRef();
 
     const onReset = () => {
         formRef.current?.resetFields();
     };
 
     return (
-        // <div style={{ flexDirection:'column'}}>
         <div style={{ width: "100%", maxWidth: 800 }}>
             <h1 style={{ textAlign: "center" }}>Calculate Your Tax</h1>
 
@@ -132,10 +157,22 @@ const Calculator = () => {
 
             <div
                 style={{ visibility: res_display ? "hidden" : "visible" }}
+            >
+              <div
+                ref={(el) => (pdfref = el)}
+                style={{ visibility: res_display ? "hidden" : "visible" }}
                 className="result"
             >
                 <h1 style={{ textAlign: "center" }}>Result</h1>
-                <table className={"custom-table"} style={{ padding:'20px', width: '100%', textAlign: 'center', marginBottom: '10px'}} >
+                <table
+                    className={"custom-table"}
+                    style={{
+                        padding: "20px",
+                        width: "100%",
+                        textAlign: "center",
+                        marginBottom: "10px",
+                    }}
+                >
                     <tr>
                         <th>Name</th> <td>{info?.name}</td>
                     </tr>
@@ -143,19 +180,30 @@ const Calculator = () => {
                         <th>Age</th> <td>{info?.age}</td>
                     </tr>
                     <tr>
-                        <th>Gender</th> <td>{info?.gender == "M"? 'Male':'Female'}</td>
+                        <th>Gender</th>{" "}
+                        <td>{info?.gender == "M" ? "Male" : "Female"}</td>
                     </tr>
                     <tr>
-                        <th>Date</th> <td>{info?.date.toString()}</td>  
+                        <th>Date</th> <td>{info?.date.toString()}</td>
                     </tr>
                     <tr>
                         <th>Tax Amount</th> <td>{res?.tax}</td>
                     </tr>
                 </table>
+            </div>
 
-                <Button type="primary" htmlType="button" >
-                    Pdf Create
-                </Button>
+            <ReactToPrint
+                style={{ marginBottom: "80px" }}
+                content={() => pdfref}
+                trigger={() => (
+                    <Button className="btn btn-primary" type="primary">
+                        Print to PDF!
+                    </Button>
+                )}
+            />
+            <Button className="btn btn" type="primary" danger onClick={submitInfo} >
+                Save
+            </Button>
             </div>
         </div>
         // </div>
