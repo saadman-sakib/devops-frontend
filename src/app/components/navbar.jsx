@@ -23,7 +23,7 @@ const items = [
   },
 
   {
-      label:  (<Link href="/logout">Logout</Link>),
+      label:  (<Link href="/">Logout</Link>),
       key: 'logout',
       icon: <LoginOutlined />,
   },
