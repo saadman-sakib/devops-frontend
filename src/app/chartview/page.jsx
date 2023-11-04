@@ -64,10 +64,17 @@ export default function CustomChart() {
     let pdfref = useRef();
     const [data, setdata] = React.useState(null);
     const [year, setYear] = React.useState(null);
+    const [year_data, set_year_data] = React.useState(null);
 
     const onClick = ({ key }) => {
         message.info(`Click on item ${key}`);
-        setYear(key);
+        let i = data.labels.findIndex( d => d == key);
+        console.log("gggg", data.datasets[0].data[i], data.datasets[1].data[i]  )
+        // setYear(key);
+        set_year_data({
+          tax: data.datasets[0].data[i],
+          income: data.datasets[1].data[i]
+        });
     };
     const getChartInfo = (values) => {
         var myHeaders = new Headers();
@@ -119,12 +126,17 @@ export default function CustomChart() {
     const [is_auth, setauth] = React.useState(true);
 
     React.useEffect(() => {
-        console.log("came2");
+        console.log("came3");
         getChartInfo();
+        console.log("data", data);
         setauth(localStorage.getItem("token") != null)
     }, []);
 
+    React.useEffect( () => {
+      console.log(year_data);
+    }, [year_data])
 
+    console.log("data", data);
 
     if (is_auth==false) {
         window.location.href = "/login";
@@ -142,9 +154,11 @@ export default function CustomChart() {
                   data = {data} 
                   />
 
+                  {/* {JSON.stringify(data)} */}
+
                     <Dropdown
                         menu={{
-                            items,
+                            items: data == null ? items : data.labels.map( d => ({"label": d, "key": d}) ),
                             onClick,
                         }}
                     >
@@ -152,8 +166,8 @@ export default function CustomChart() {
                             type="primary"
                             onClick={(e) => {
                               e.preventDefault()
-                              let tmp = data.datasets[0].data.filter((el, i) => data.labels[i] == year)
-                              console.log(tmp);
+                              // let tmp = data.datasets[0].data.filter((el, i) => data.labels[i] == year)
+                              // console.log(tmp);
                             }}
                         >
                             <Space>
@@ -168,7 +182,7 @@ export default function CustomChart() {
                     <Progress
                         style={{ display: "flex", justifyContent: "center" }}
                         type="circle"
-                        percent={30}
+                        percent={(year_data?.tax / year_data?.income) * 100}
                         size={200}
                     />
                     <h3 style={{ marginTop: "40px" }}> tax information </h3>
@@ -183,23 +197,13 @@ export default function CustomChart() {
                             }}
                         >
                             <tr>
-                                <th>Name</th> <td> Jamal </td>
+                                <th>Year</th> <td>{year}</td>
                             </tr>
                             <tr>
-                                <th>Age</th> <td> 45 </td>
+                                <th>Income Amount</th> <td>{year_data?.income}</td>
                             </tr>
                             <tr>
-                                <th>Gender</th>
-                                <td>Male</td>
-                            </tr>
-                            <tr>
-                                <th>Year</th> <td>2023</td>
-                            </tr>
-                            <tr>
-                                <th>Income Amount</th> <td>12518698253</td>
-                            </tr>
-                            <tr>
-                                <th>Tax Amount</th> <td>1251253</td>
+                                <th>Tax Amount</th> <td>{year_data?.tax}</td>
                             </tr>
                         </table>
                     </div>
