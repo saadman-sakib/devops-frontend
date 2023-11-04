@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { AppstoreOutlined, MailOutlined, SettingOutlined, ProfileOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { AppstoreOutlined, MailOutlined, SettingOutlined, ProfileOutlined, LoginOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import Link from 'next/link';
 
@@ -21,23 +21,40 @@ const items = [
     key: 'calculaor',
     icon: <SettingOutlined />,
   },
+
   {
-    label:  (<Link href="/adminpanel">Admin</Link>),
-    key: 'adminpanel',
-    icon: <ProfileOutlined />,
+      label:  (<Link href="/logout">Logout</Link>),
+      key: 'logout',
+      icon: <LoginOutlined />,
   },
+  // {
+  //   label:  (<Link href="/adminpanel">Admin</Link>),
+  //   key: 'adminpanel',
+  //   icon: <ProfileOutlined />,
+  // },
 ];
 const Navbar = () => {
   const [current, setCurrent] = useState('home');
-  const is_auth = true;
   const onClick = (e) => {
     console.log('click ', e);
     setCurrent(e.key);
+    if(e.key=='logout'){
+      localStorage.removeItem('token');
+      localStorage.removeItem('id');
+      window.location.reload();
+    }
   };
-  if(is_auth){
-    return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />;
-  } else {
+  const [is_auth, setAuth] = useState(null);
+  useEffect( ()=>{
+    if(localStorage.getItem('token')===null){
+      setAuth(localStorage?.getItem('token')!==null);
+    }
+  },[])
+
+  if (is_auth==false){
     return <></>
+  } else {
+    return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />;
   }
 };
 export default Navbar;

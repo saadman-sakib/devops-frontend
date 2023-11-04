@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
 
 import ReactToPrint from "react-to-print";
@@ -14,7 +14,7 @@ const Calculator = () => {
     const [res_display, setResDisplay] = React.useState(true);
 
     const onFinish = (values) => {
-        console.log(info.date.toString());
+        console.log(values.date.toString());
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -25,7 +25,7 @@ const Calculator = () => {
             date: values.date.toString(),
             gender: values.gender,
             age: values.age,
-            location: "RANGPUR",
+            location: "RANGPUR"
         });
 
         var requestOptions = {
@@ -36,7 +36,7 @@ const Calculator = () => {
         };
 
         fetch(
-            "https://asdasdasd-uwv3gbod2a-uc.a.run.app/wizard/calculate",
+            "https://cloud-run-tf-dev-uwv3gbod2a-uc.a.run.app/wizard/calculate",
             requestOptions
         )
             .then((response) => response.json())
@@ -48,15 +48,32 @@ const Calculator = () => {
             .catch((error) => console.log("error", error));
     };
 
+    const [is_auth, setIsAuth] = useState(false);
+
+    useEffect(() => {
+        if (localStorage.getItem("token") == null) {
+            setIsAuth(false);
+        } else {
+            setIsAuth(true);
+        }
+    }, []);
+
     const submitInfo = (values) => {
+
+        if(!is_auth){
+            alert("Please login first");
+            window.location.href = "/login";
+            return;
+        }
+
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
 
       var raw = JSON.stringify({
-          id: res.id,
-          year: res.date.year(),
-          income: res.income,
+          id: localStorage.getItem("id"),
+          year: info.date.year(),
+          income: info.income,
           tax: res.tax,
           token: localStorage.getItem("token"),
       });
@@ -69,10 +86,10 @@ const Calculator = () => {
       };
 
       fetch(
-          "https://asdasdasd-uwv3gbod2a-uc.a.run.app/dashboard/submit-info",
+          "https://cloud-run-tf-dev-uwv3gbod2a-uc.a.run.app/dashboard/submit-info/",
           requestOptions
       )
-          .then((response) => response.json())
+          .then((response) => response)
           .then((result) => {
               console.log(result);
           })
