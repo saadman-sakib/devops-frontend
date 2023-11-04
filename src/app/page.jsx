@@ -20,10 +20,12 @@ export default function Home() {
       </main>
     )
   } else {
+    
     return (
       <main style={{textAlign: 'center'}} >
         <h1>Home</h1>
         <p>Welcome to Tax Calculator</p>
+        <Link href="/calculator" > start calculating </Link>
       </main>
     )
   }
